@@ -12,6 +12,7 @@
   - `source venv/bin/activate` 
   - `pip install -r requirements.txt`
   - `deactivate`
+- Create `.env`. Example is in the repo
 - Setup cronjob
   - `crontab -e`
     - Add `0 12 * * * /usr/local/cronjob/affirmationSMS/affirmationSMS.sh`
