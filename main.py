@@ -14,6 +14,9 @@ testing     = os.getenv('TESTING') == 'true'
 
 print_seperator = "-" * 10
 
+if testing:
+  consumers = consumers[0]
+
 config_print = f'''
   account_sid: {account_sid}
   auth_token: {auth_token}
@@ -23,9 +26,6 @@ config_print = f'''
 
 client = Client(account_sid, auth_token)
 
-if testing:
-  consumers = consumers[0]
-
 def main(client=client, consumers=consumers):
   r = requests.get('https://www.affirmations.dev/', headers={"Accept": "application/json"})
   
@@ -34,19 +34,23 @@ def main(client=client, consumers=consumers):
     message += r.json()["affirmation"]
   else:
     message +=  "Sorry there appears to be a problem with the AffirmationSMS service today. Don't worry suisuss will have gotten this message too, and will get around to fixing the service ASAP. Thank you for your understanding"
+    
+  message_response_sids = []
+  for consumer in consumers:
+    message_response = client.api.account.messages.create(
+            body   =message,
+            from_  =from_,
+            to     =consumer
+        )
+    message_response_sids.append(message_response.sid)
 
-  message_response = client.api.account.messages.create(
-          body   =message,
-          from_  =from_,
-          to     =consumers
-      )
 
 
 
   message_print = f'''
   status_code: {r.status_code}
   message: "{message}"
-  message_response: {message_response.sid}
+  message_response: {message_response_sids}
   '''
 
   print(message_print)
